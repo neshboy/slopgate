@@ -1,0 +1,35 @@
+name: "SlopGate"
+description: >-
+  Scores incoming pull requests for cheap, deterministic AI-slop signals
+  (no tests changed, boilerplate description, huge diff with a near-empty
+  description, description reused from a prior PR) and applies a label for
+  maintainer triage. Does not auto-merge, auto-close, auto-reject, or
+  suppress the initial GitHub notification.
+author: "SlopGate contributors"
+inputs:
+  github-token:
+    description: "GitHub token used to read PR data and apply labels (usually secrets.GITHUB_TOKEN)."
+    required: true
+  label:
+    description: "Label to apply when the composite score is at or above the threshold."
+    required: false
+    default: "possible-ai-slop"
+  threshold:
+    description: "Composite score (0-100) at or above which the label is applied."
+    required: false
+    default: "60"
+  comment:
+    description: 'Whether to post an itemized-reasoning comment on the PR when labeled ("true"/"false").'
+    required: false
+    default: "true"
+outputs:
+  score:
+    description: "Composite slop score from 0-100."
+  label-applied:
+    description: 'Whether the label was applied ("true"/"false").'
+runs:
+  using: "node20"
+  main: "dist/action.cjs"
+branding:
+  icon: "filter"
+  color: "yellow"
