@@ -24262,6 +24262,9 @@ function statusIcon(applicable, score) {
   if (!applicable) return "-";
   return score > 0 ? "!" : "OK";
 }
+function escapeMarkdownTableCell(text) {
+  return text.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/`/g, "\\`").replace(/\[/g, "\\[").replace(/\]/g, "\\]").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 function formatPlainReport(result) {
   const lines = [];
   lines.push(`SlopGate score: ${result.score}/100 (label threshold: ${result.threshold})`);
@@ -24289,7 +24292,7 @@ function formatMarkdownReport(result, labelName) {
   lines.push("| --- | --- | --- |");
   for (const h of result.heuristics) {
     const scoreText = h.applicable ? `${h.score}/${h.weight}` : `skipped`;
-    lines.push(`| ${h.label} | ${scoreText} | ${h.reason.replace(/\|/g, "\\|")} |`);
+    lines.push(`| ${h.label} | ${scoreText} | ${escapeMarkdownTableCell(h.reason)} |`);
   }
   lines.push("");
   lines.push(

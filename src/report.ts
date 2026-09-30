@@ -5,6 +5,26 @@ function statusIcon(applicable: boolean, score: number): string {
   return score > 0 ? "!" : "OK";
 }
 
+/**
+ * Heuristic `reason` strings can embed attacker-controlled text verbatim
+ * (e.g. a changed file's path, which a PR author fully controls). Since
+ * these reasons get posted as a live PR comment, any markdown-significant
+ * character in that text must be neutralized here - not just `|` for the
+ * table syntax - or a crafted file/branch name like
+ * `[Click here](https://evil.example/phish)x.test.ts` renders as a live
+ * clickable link inside SlopGate's own bot comment.
+ */
+function escapeMarkdownTableCell(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\|/g, "\\|")
+    .replace(/`/g, "\\`")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 /** Plain-text itemized report, used by the CLI. */
 export function formatPlainReport(result: ScoreResult): string {
   const lines: string[] = [];
@@ -39,7 +59,7 @@ export function formatMarkdownReport(result: ScoreResult, labelName: string): st
   lines.push("| --- | --- | --- |");
   for (const h of result.heuristics) {
     const scoreText = h.applicable ? `${h.score}/${h.weight}` : `skipped`;
-    lines.push(`| ${h.label} | ${scoreText} | ${h.reason.replace(/\|/g, "\\|")} |`);
+    lines.push(`| ${h.label} | ${scoreText} | ${escapeMarkdownTableCell(h.reason)} |`);
   }
   lines.push("");
   lines.push(
