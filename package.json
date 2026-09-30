@@ -5,7 +5,6 @@
   "license": "MIT",
   "author": "SlopGate contributors",
   "type": "commonjs",
-  "main": "dist/index.cjs",
   "bin": {
     "slopgate": "dist/cli.cjs"
   },
